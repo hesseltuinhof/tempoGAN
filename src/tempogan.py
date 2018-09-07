@@ -123,11 +123,8 @@ class Network():
                              self.bounds])
 
                     if step % 5 == 0 and self.debug:
-                        print("loss_G: {:.4f}, loss_D_s: {:.4f}, loss_D_t: "
-                              + "{:.4f}".format(_loss_G, _loss_D_s, _loss_D_t))
-                        print("D_s: [{:.4f}, {:.4f}] D_s_g: [{:.4f}, {:.4f}]\n"
-                              + "D_t: [{:.4f}, {:.4f}] D_t_g: [{:.4f}, {:.4f}]"
-                              .format(*debug_vals))
+                        print("loss_G: {:.4f}, loss_D_s: {:.4f}, loss_D_t: {:.4f}".format(_loss_G, _loss_D_s, _loss_D_t))
+                        print("D_s: [{:.4f}, {:.4f}] D_s_g: [{:.4f}, {:.4f}]\nD_t: [{:.4f}, {:.4f}] D_t_g: [{:.4f}, {:.4f}]".format(*debug_vals))
 
                     Loss_G += _loss_G
                     Loss_D_s += _loss_D_s
@@ -145,9 +142,7 @@ class Network():
             Loss_G /= step
             Loss_D_s /= step
             Loss_D_t /= step
-            print("[*] epoch {}/{} loss_G: {:.4f}  loss_D_s: {:.4f}  loss_D_t:"
-                  + " {:.4f}".format(epoch+1, self.num_epochs, Loss_G,
-                                     Loss_D_s, Loss_D_t))
+            print("[*] epoch {}/{} loss_G: {:.4f}  loss_D_s: {:.4f}  loss_D_t: {:.4f}".format(epoch+1, self.num_epochs, Loss_G, Loss_D_s, Loss_D_t))
 
             summary = sess.run(
                     self.summary,
