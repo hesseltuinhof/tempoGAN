@@ -38,6 +38,6 @@ if __name__ == '__main__':
                         help='Name of tfrecord file containing training data.')
     parser.add_argument('--testdata',
                         default=None,
-                        help='Name of tfrecordfile containg validation data.')
+                        help='Name of tfrecord file containing validation data.')
     args = vars(parser.parse_args())
     main(args['input'], args['testdata'])

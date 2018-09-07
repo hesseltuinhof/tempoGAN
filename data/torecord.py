@@ -1,16 +1,17 @@
 import tensorflow as tf
-
+import argparse, os, sys
 from glob import glob
+sys.path.append('..')
 from utils import read_uni
 
 
-def write_uni_to_record(folderprefix, filename='data.tfrecords'):
+def write_uni_to_record(folderprefix, filename):
     """
     Convert a folder containing 'density_*.uni' and 'vel_*.uni' files
     into a TFRecords file.
     """
     assert filename.endswith('.tfrecords'), "Wrong file extension"
-    writer = tf.python_io.TFRecordWriter(filename)
+    writer = tf.python_io.TFRecordWriter(os.path.dirname(os.path.abspath( __file__ )) + '/' + filename)
 
     densities, velocities = _get_uni_list(folderprefix)
     assert len(densities) == len(velocities)
@@ -40,7 +41,7 @@ def write_uni_to_record(folderprefix, filename='data.tfrecords'):
                 'vn': _bytes_feature(vn.tostring())}))
             writer.write(sample.SerializeToString())
 
-            print("%d/%d" % (j, N), end="\r", flush=True)
+            print("%d/%d" % (j, N-2), end="\r", flush=True)
         print("\n")
     writer.close()
 
@@ -61,7 +62,7 @@ def _get_uni_list(folderprefix=''):
     velocities = []
     for folder in folders:
         densities.append(sorted(glob(folder + "/density_*.uni")))
-        velocities.append(sorted(glob(folder + "/vel_*.uni")))
+        velocities.append(sorted(glob(folder + "/velocity_*.uni")))
     return (densities, velocities)
 
 
@@ -69,3 +70,14 @@ def _read_file(f):
     _, x = read_uni(f)
     x_down = x[::4, ::4, ::4, :]
     return x_down, x
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--folderprefix',
+                        default=os.path.dirname(os.path.abspath( __file__ )) + '/sim',
+                        help='Folder prefix of simulation data.')
+    parser.add_argument('--output',
+                        default='data.tfrecords',
+                        help='Name of tfrecord file containing simulation output data.')
+    args = vars(parser.parse_args())
+    write_uni_to_record(args['folderprefix'], args['output'])
