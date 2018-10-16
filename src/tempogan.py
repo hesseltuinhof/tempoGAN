@@ -34,8 +34,8 @@ class Network():
         Gn = generator(dtn, name="G", reuse=True)
 
         # spatial discriminator
-        D_s = discriminator_spatial(dtc, Dtc, name="D_s", reuse=False)
-        D_s_g = discriminator_spatial(dtc, G, name="D_s", reuse=True)
+        D_s, Fj_y = discriminator_spatial(dtc, Dtc, name="D_s", reuse=False)
+        D_s_g, Fj_G = discriminator_spatial(dtc, G, name="D_s", reuse=True)
 
         # temporal discriminator
         D_t = discriminator_temporal([Dtp, Dtc, Dtn],
@@ -56,7 +56,9 @@ class Network():
                                     - D_t_g*config.label_smooth))
 
         self.loss_G = -tf.reduce_mean(tf.log(D_s_g) + tf.log(D_t_g)) \
-            + config.lambda_L * tf.reduce_mean(tf.norm(G - Dtc))
+            + config.lambda_L * tf.reduce_mean(tf.norm(G - Dtc, ord=1)) \
+            + sum([config.lambdas_j[k]*tf.reduce_mean(tf.norm(Fj_G[k] - Fj_y[k])^2) \
+                   for k in range(len(config.lambdas_j))])
 
         # get variable names
         trainable_vars = tf.trainable_variables()
@@ -242,7 +244,7 @@ def discriminator_spatial(x, y, name="discriminator_spatial", norm="batch",
                           name=name+"_fc5", reuse=reuse)
     output = tf.sigmoid(fc5, name=name+"out")
 
-    return output
+    return output, [lrelu1, lrelu2, lrelu3, lrelu4]
 
 
 def advection(y, v, name="advection"):
